@@ -1,0 +1,9 @@
+{
+  "name": "playq-base-project",
+  "version": "1.0.0",
+  "build": "2025.11.05.001",
+  "branch": "main",
+  "commit": "d7a3c9b",
+  "released": "2025-11-05T09:30:00Z",
+  "notes": "Created the base PlayQ Core Project"
+}
