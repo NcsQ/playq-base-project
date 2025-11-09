@@ -1,0 +1,3 @@
+# Ignore PlayQ release artefacts
+releases/
+*.zip
