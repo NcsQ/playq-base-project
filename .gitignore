@@ -1,3 +1,4 @@
-# Ignore PlayQ release artefacts
-releases/
+# Ignore contents but keep folder
+releases/*
+!releases/.gitkeep
 *.zip
