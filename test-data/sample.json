@@ -1,0 +1,11 @@
+{
+  "user": {
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "email": "jane.doe@example.com"
+  },
+  "settings": {
+    "newsletter": true,
+    "theme": "light"
+  }
+}

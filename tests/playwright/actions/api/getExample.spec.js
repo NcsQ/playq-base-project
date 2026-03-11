@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const test_1 = require("@playwright/test");
+const core_1 = require("@playq/core");
+const baseUrl = 'https://jsonplaceholder.typicode.com';
+(0, test_1.test)('GET example - posts', async () => {
+    await core_1.api.get('posts', 'getAll', baseUrl);
+    await core_1.api.verifyStatus(200);
+    await core_1.api.verifyPathValue('[0].id', '1');
+    await core_1.api.verifyPathValue('[0].userId', '1');
+});
