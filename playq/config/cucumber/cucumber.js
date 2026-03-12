@@ -13,83 +13,18 @@ function runPreprocessingOnce() {
     // 1. Generate / refresh Step Group cache & step defs
     generateStepGroupsIfNeeded(false);
 
-    // 2. Determine which features to preprocess
-    let featuresToProcess = [];
-    const isRerun = process.env.PLAYQ_IS_RERUN === 'true';
-    
-    if (isRerun) {
-      // RERUN MODE: Only preprocess features from @rerun.txt
-      const rerunFile = path.resolve('@rerun.txt');
-      if (fs.existsSync(rerunFile)) {
-        const rerunContent = fs.readFileSync(rerunFile, 'utf-8');
-        const scenarioPaths = rerunContent.split('\n').map(l => l.trim()).filter(Boolean);
-        
-        // Extract unique feature file paths and convert back to source paths
-        const uniqueFeatures = new Set();
-        scenarioPaths.forEach(scenarioPath => {
-          // Remove line numbers: "_Temp/execution/forms.feature:8" -> "_Temp/execution/forms.feature"
-          const normalized = scenarioPath.replace(/\\/g, '/');
-          const lastColonIdx = normalized.lastIndexOf(':');
-          const featurePath = lastColonIdx > -1 ? normalized.substring(0, lastColonIdx) : normalized;
-          // Convert back to source: "_Temp/execution/forms.feature" -> "tests/bdd/scenarios/forms.feature"
-          let sourcePath = featurePath.replace('_Temp/execution/', 'tests/bdd/scenarios/');
-          sourcePath = sourcePath.replace(/^execution\//, 'tests/bdd/scenarios/');
-          uniqueFeatures.add(sourcePath);
-        });
-        
-        featuresToProcess = Array.from(uniqueFeatures);
-        console.log(`✅ RERUN MODE: Preprocessing ${featuresToProcess.length} feature(s) from @rerun.txt:`, featuresToProcess);
-      } else {
-        console.warn('⚠️  RERUN MODE: @rerun.txt not found, preprocessing all features');
-        // Fall back to normal mode
-        const srcRoot = path.resolve('tests/bdd/scenarios');
-        if (fs.existsSync(srcRoot)) {
-          const walk = (dir) => {
-            for (const entry of fs.readdirSync(dir)) {
-              const full = path.join(dir, entry);
-              const stat = fs.statSync(full);
-              if (stat.isDirectory()) walk(full);
-              else if (entry.endsWith('.feature')) featuresToProcess.push(full);
-            }
-          };
-          walk(srcRoot);
-        }
-      }
-    } else {
-      // FRESH RUN: Preprocess all features
-      const srcRoot = path.resolve('tests/bdd/scenarios');
-      if (fs.existsSync(srcRoot)) {
-        const walk = (dir) => {
-          for (const entry of fs.readdirSync(dir)) {
-            const full = path.join(dir, entry);
-            const stat = fs.statSync(full);
-            if (stat.isDirectory()) walk(full);
-            else if (entry.endsWith('.feature')) featuresToProcess.push(full);
-          }
-        };
-        walk(srcRoot);
-      }
-      console.log(`ℹ️  FRESH RUN: Preprocessing ${featuresToProcess.length} feature(s)`);
-    }
-
-    // 3. Clean up execution folder BEFORE preprocessing (especially important for reruns)
-    // This ensures only the rerun-requested features are present in _Temp/execution
-    const outRoot = path.resolve('_Temp', 'execution');
-    if (fs.existsSync(outRoot)) {
-      fs.rmSync(outRoot, { recursive: true, force: true });
-      console.log(`🧹 Cleaned execution folder before preprocessing: ${outRoot}`);
-    }
+  // 2. Preprocess each source feature under tests/bdd/scenarios --> _Temp/execution
+  const srcRoot = path.resolve('tests/bdd/scenarios');
+    const outRoot = path.resolve('_Temp/execution');
     fs.mkdirSync(outRoot, { recursive: true });
-
-    // 4. Preprocess each feature
-    featuresToProcess.forEach(featurePath => {
-      try {
-        preprocessFeatureFile(featurePath);
-      } catch (err) {
-        console.warn(`⚠️  Failed to preprocess ${featurePath}:`, (err.message || err));
+    const walk = (dir) => {
+      for (const entry of fs.readdirSync(dir)) {
+        const full = path.join(dir, entry);
+        const stat = fs.statSync(full);
+        if (stat.isDirectory()) walk(full); else if (entry.endsWith('.feature')) preprocessFeatureFile(full);
       }
-    });
-    
+    };
+    if (fs.existsSync(srcRoot)) walk(srcRoot);
     process.env.PLAYQ_PREPROCESSED = '1';
     console.log('✅ Cucumber preprocessing complete: _Temp/execution');
   } catch (err) {
@@ -131,15 +66,34 @@ module.exports = {
             "ts-node/register",
             "tsconfig-paths/register"
         ],
-        format: (() => {
-            const isRerun = process.env.PLAYQ_IS_RERUN === 'true';
-            const reportBaseName = isRerun ? 'cucumber-report-rerun' : 'cucumber-report';
-            return [
-                "progress-bar",
-                `html:test-results/${reportBaseName}.html`,
-                `json:test-results/${reportBaseName}.json`
-            ];
-        })(),
+        format: [
+            "progress-bar",
+            "html:test-results/cucumber-report.html",
+            "json:test-results/cucumber-report.json",
+            "rerun:@rerun.txt"
+        ],
         parallel: 1
-    }
+    },
+    // rerun: {
+    //     formatOptions: {
+    //         snippetInterface: "async-await"
+    //     },
+    //     dryRun: false,
+  //     require: [
+  //         "ts-node/register",
+  //         "tsconfig-paths/register",  // <-- added for rerun profile as well
+  //         "./tests/bdd/steps/**/*.ts",
+  //         "./src/hooks/hooks.ts"
+  //     ],
+    //     requireModule: [
+    //         "ts-node/register"
+    //     ],
+    //     format: [
+    //         "progress-bar",
+    //         "html:test-results/cucumber-report.html",
+    //         "json:test-results/cucumber-report.json",
+    //         "rerun:@rerun.txt"
+    //     ],
+    //     parallel: 2
+    // }
 }
