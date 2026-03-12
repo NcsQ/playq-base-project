@@ -1,14 +1,14 @@
 export const config = {
   baseUrl: "https://your-app.com", // Excepted: Any url. Default: Blank
-  cucumber:{
+  cucumber: {
     featureFileCache: false, // [true | false] Excepted: Boolean only. Default: false
     stepGroupCache: true // [true | false] Excepted: Boolean only. Default: false
   },
   browser: {
     playwrightSession: "shared",     // "shared" | "isolated" | "perTest" | "perFile" | "none" - [ Default: shared ]     (Playwright Runner Browser Session Control)
     cucumberSession: "perScenario",  // "shared" | "perScenario" | "perFeature" - [ Default: shared ] (Cucumber Browser Session Control)
-    headless: true,    // Optional: run in headless mode - [ Default: true ]
-    browserType: "chromium", // "chromium" | "firefox" | "webkit" - [ Default: "chromium" ]
+    headless: false,    // Optional: run in headless mode - [ Default: true ]
+    browserType: "chromium", // "chromium" | "firefox" | "webkit" | "chrome" | "msedge" - [ Default: "chromium" ]
   },
   artifacts: {
     screenshot: true, // [true | false] Expected: Boolean only. Default: false
@@ -32,33 +32,33 @@ export const config = {
     order: "sequential", // Expected: "sequential" or "random". Default: "sequential"
     autoReportOpen: true, // [true | false] Expected: Boolean only. Default: true
   },
-  apiTest:{
+  apiTest: {
     maxUrlRedirects: 5, // Expected: numeric only. Default: 5
     timeout: 10000,     // Expected: numeric only. Default: 10000 milliseconds (10 seconds)
   },
   patternIq: {
-    enable:true, // Expected: Boolean only. Default: false *
-    config: "pattern",
+    enable: true, // Expected: Boolean only. Default: false *
+    config: "lambdatest", // Expected: string only. Note: Don't mention ".pattern.ts"
     retryInterval: 2000, // [in milliseconds] Expected: Numeric only. Default: 2000 milliseconds (2 seconds) *
     retryTimeout: 30000, // [in milliseconds] Expected: Numeric only. Default: 30000 milliseconds (30 seconds) *
   },
   smartAi: {
-    enable:false, // [true | false] Expected: Boolean only. Default: false *
+    enable: false, // [true | false] Expected: Boolean only. Default: false *
     consoleLog: true, // [true | false] Expected: Boolean only. Default: false *
     resolve: "smart", // ["smart" | "always"] Expected: string only. Default: "smart" *
   },
   addons: {
     d365Crm: {
-       enable:true, // [true | false] Expected: Boolean only. Default: false *
-       version: "v9.2", // Expected: "v9.2" or "v9.2.nl". Default: "v9.2"
-      },
+      enable: true, // [true | false] Expected: Boolean only. *
+      version: "v9.2", // Expected: "v9.2" or "v9.2.nl". Default: "v9.2"
+    },
     d365FinOps: {
-       enable:false, // [true | false] Expected: Boolean only. Default: false *
-       version: "v9.2", // Expected: "v9.2" or "v9.2.nl". Default: "v9.2"
-      },
+      enable: false, // [true | false] Expected: Boolean only.*
+      version: "v9.2", // Expected: "v9.2" or "v9.2.nl". Default: "v9.2"
+    }
   },
-  report:{
-    allure:{
+  report: {
+    allure: {
       singleFile: false // [true | false] Expected: Boolean only. Default: false * [Require Allure to be installed in the system]
 
     }

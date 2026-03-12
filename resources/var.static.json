@@ -1,0 +1,8 @@
+{
+  "NAME": "#{faker.custom.person.fullName()}",
+  "MESSAGE": "hello {{NAME}}, you are using playq, your date of birth is {{DOB}}",
+  "DOB": "#{faker.date.birthdate({min: 18, max: 65, mode: 'age'})}",
+  "Company": "#{faker.company.name()}",
+  "IdmCentreCode": "A123",
+  "myPersistentKey": "persistentValue"
+}
