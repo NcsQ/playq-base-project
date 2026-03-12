@@ -8,7 +8,7 @@
     "test:cucumber": "playq --runner cucumber"
   },
   "dependencies": {
-    "@playq/core": "file:../playq-core-main/playq-core-0.2.92.tgz",
+    "@playq/core": "file:../playq-core-main/playq-core-0.2.93.tgz",
     "ajv": "^8.17.1",
     "cd": "^0.3.3"
   },
